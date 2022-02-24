@@ -19,6 +19,8 @@ class Melon:
         image_url,
         color,
         seedless,
+        quantity=0,
+        line_price=0
     ):
         self.melon_id = melon_id
         self.melon_type = melon_type
@@ -27,11 +29,18 @@ class Melon:
         self.image_url = image_url
         self.color = color
         self.seedless = seedless
+        self.quantity = quantity
+        self.line_price = line_price
 
     def price_str(self):
         """Return price formatted as string $x.xx"""
 
         return f"${self.price:.2f}"
+
+    def update_line_price(self):
+        """Updates line price by quantity and unit cost"""
+
+        self.line_price = self.quantity * self.price
 
     def __repr__(self):
         """Convenience method to show information about melon in console."""
@@ -107,3 +116,4 @@ def get_by_id(melon_id):
 # Format is {id: Melon object, ... }
 
 melon_types = read_melon_types_from_file("melons.txt")
+

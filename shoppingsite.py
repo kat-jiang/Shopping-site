@@ -51,7 +51,7 @@ def show_melon(melon_id):
     """
 
     melon = melons.get_by_id(melon_id)
-    print(melon)
+    
     return render_template("melon_details.html",
                            display_melon=melon)
 
@@ -62,44 +62,42 @@ def show_shopping_cart():
 
     # TODO: Display the contents of the shopping cart.
 
-    #for loop over every item in cart
-    #cart is accessed by session["cart"]
-    #cart items are accessed by session["cart"][melon id]
-    #for looping over dictionaries by default with no other clarifiers loops over the keys alone
+    #create and return a list of melon objects that also had quantity and total cost
+    #what we have is a dictionary of key melon_id and value quantity
 
     cart_dict = session["cart"]
     melons_list = []
     total_cost = 0
-    
-    for melon in cart_dict:
-        display_name = melons.melon_types[melon].common_name
-        unit_cost = melons.melon_types[melon].price
-        quantity = cart_dict[melon]
-        line_total = unit_cost * quantity
+
+    for id in cart_dict:   
+        melon_purchase = melons.Melon(id,
+                                melons.melon_types[id],
+                                melons.melon_types[id].common_name,
+                                melons.melon_types[id].price,
+                                melons.melon_types[id].image_url,
+                                melons.melon_types[id].color,
+                                melons.melon_types[id].seedless,
+                                cart_dict[id]
+                                )
+        melon_purchase.update_line_price()
+        melons_list.append(melon_purchase)
+        total_cost += melon_purchase.line_price
+
+
+    #-----------------------solution list in list------------------#
+    # for melon in cart_dict:
+    #     display_name = melons.melon_types[melon].common_name
+    #     unit_cost = melons.melon_types[melon].price
+    #     quantity = cart_dict[melon]
+    #     line_total = unit_cost * quantity
         
-        single_melon_list = [display_name, unit_cost, quantity, line_total]
+    #     total_cost += line_total
 
-        melons_list.append(single_melon_list)
+    #     single_melon_list = [display_name, unit_cost, quantity, line_total]
 
+    #     melons_list.append(single_melon_list)
 
-
-    # The logic here will be something like:
-    #
-    # - get the cart dictionary from the session
-    # - create a list to hold melon objects and a variable to hold the total
-    #   cost of the order
-    # - loop over the cart dictionary, and for each melon id:
-    #    - get the corresponding Melon object
-    #    - compute the total cost for that type of melon
-    #    - add this to the order total
-    #    - add quantity and total cost as attributes on the Melon object
-    #    - add the Melon object to the list created above
-    # - pass the total order cost and the list of Melon objects to the template
-    #
-    # Make sure your function can also handle the case wherein no cart has
-    # been added to the session
-
-    return render_template("cart.html", )
+    return render_template("cart.html", melons_list=melons_list, total=total_cost)
 
 
 @app.route("/add_to_cart/<melon_id>")
@@ -112,7 +110,7 @@ def add_to_cart(melon_id):
 
     # TODO: Finish shopping cart functionality
 
-    #if cart exists in current sesssion - what is the syntax for this?
+    #if cart exists in current sesssion
    
     if session.get("cart") == None:
         session["cart"] = {}
